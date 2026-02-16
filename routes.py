@@ -136,6 +136,6 @@ def get_course_student(id:int,db:Session=Depends(get_db)):
     course = db.query(Course).filter(Course.id == id).first()
  
     return {
-        "name": course.title,
-        "courses": [c.student.name for c in course.enrollments]
+        "courses": course.title,
+        "students": [c.student.name for c in course.enrollments]
     }
