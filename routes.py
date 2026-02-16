@@ -99,7 +99,12 @@ def create_enroll(enrollment_info: EnrollmentCreate, db: Session = Depends(get_d
     db.refresh(db_enrollment)
     return db_enrollment
 
-from sqlalchemy.orm import joinedload
+@router.get("/students")
+def get_studentss(semester:int,db:Session=Depends(get_db)):
+    if semester:
+        return db.query(Student).join(Enrollment).filter(Enrollment.semester==semester).all()
+    else:
+        raise HTTPException(status_code=404,detail="sem is not find!!")
 
 @router.get("/lazy/teachers/{id}", response_model=TeacherResponse)
 def get_teacher(id: int, db: Session = Depends(get_db)):
@@ -139,3 +144,16 @@ def get_course_student(id:int,db:Session=Depends(get_db)):
         "courses": course.title,
         "students": [c.student.name for c in course.enrollments]
     }
+
+@router.get("/departments/{id}")
+def get_department_teacher(id:int,db:Session=Depends(get_db)):
+    department = db.query(Department).filter(Department.id == id).first()
+    if department is None:
+        raise HTTPException(status_code=404,detail="wrong id!")
+    return {
+        "department": department.name,
+        "teachers": [c.name for c in department.teacher]
+    }
+    
+
+
